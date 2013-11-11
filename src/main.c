@@ -177,14 +177,23 @@ void cruzaCromossomos(){
     getchar();
     pai1 = &populacao[rand1];
     pai2 = &populacao[rand2];
-    novo.peso = pai1->peso + pai2->peso;
-    novo.cols = pai1->cols;
-    elem *cols = novo.cols;
+    elem *cols = pai1->cols;
+    int tano2 = 0;
+    novo.cols = NULL;
     while(cols->next != NULL){
+        elem *ncol = malloc(sizeof(elem));
+        ncol->indice = cols->indice;
+        ncol->next = novo.cols;
+        novo.cols = ncol;
         cols = cols->next;
+        if(cols->next == NULL && tano2 == 0){
+            cols = pai2->cols;
+            tano2++;
+        }
     }
     cols->next = pai2->cols;
     novo.lins = pai1->lins;
+    novo.peso = pai1->peso + pai1->peso;
     int i;
     for(i = 1; i < nlins+1; i++)
         novo.lins[i] += pai2->lins[i];
