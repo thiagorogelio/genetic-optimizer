@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1384163457 source:/home/maxx/genetic-optimizer-master/src/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	"include/structs.h"
+
+1383568985 /home/maxx/genetic-optimizer-master/src/include/structs.h
+
