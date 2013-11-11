@@ -45,7 +45,7 @@ void splitLinha(char str[]){
             ncol = atoi(buff);
             coluna = calloc(ncol+1, sizeof(list));
             //printf("%d colunas",atoi(buff)+1);
-            /*int i;
+            /*int i;//
             for(i=0;i < ncol+1; i++){
                 coluna[i].next = NULL;
                 coluna[i].peso = 0;
@@ -164,6 +164,49 @@ void geraPopInicial(){
     }
 }
 
+void cruzaCromossomos(){
+    cromossomo *pai1, *pai2, novo;
+    int rand1, rand2;
+    rand1 = 0;
+    rand2 = 0;
+    while(rand1 == rand2){
+        rand1 = rand() %  INITIAL_POP;
+        rand2 = rand() %  INITIAL_POP;
+    }
+    printf("\npai1 %d , pai2 %d",rand1,rand2);
+    getchar();
+    pai1 = &populacao[rand1];
+    pai2 = &populacao[rand2];
+    novo.peso = pai1->peso + pai2->peso;
+    novo.cols = pai1->cols;
+    elem *cols = novo.cols;
+    while(cols->next != NULL){
+        cols = cols->next;
+    }
+    cols->next = pai2->cols;
+    novo.lins = pai1->lins;
+    int i;
+    for(i = 1; i < nlins+1; i++)
+        novo.lins[i] += pai2->lins[i];
+
+    printf("novo crom peso pai1 %f pai2 %f res %f",pai1->peso,pai2->peso,novo.peso);
+    //insereNapop(aux);
+}
+
+void geneticOptimizer(){
+    geraPopInicial();
+    float menorpeso = populacao[0].peso;
+    int ciclosSemMelhoria = 0;
+    while(ciclosSemMelhoria < 100){
+        cruzaCromossomos();
+        if(populacao[0].peso < menorpeso){
+            menorpeso = populacao[0].peso;
+            ciclosSemMelhoria = 0;
+        } else
+            ciclosSemMelhoria++;
+    }
+}
+
 void printCromossomo(cromossomo *crom){
     printf("\nCromossomo peso: %f , linhas: ",crom->peso);
     int i;
@@ -182,11 +225,9 @@ void imprimePop(){
        }
     }
 }
-int main( int argc, char *argv[] )
-{
+
+int main( int argc, char *argv[] ){
    importaArq("../tests/Teste_01.txt");
-   geraPopInicial();
-   //imprimePop();
-   //printElems();
+   geneticOptimizer();
   return 0;
 }
