@@ -10,6 +10,16 @@ cromossomo *populacao;
 int ncol;
 int nlins;
 
+double calcPeso(cromossomo *crom){
+    double cont = 0;
+    elem *cols = crom->cols;
+    while(cols){
+        cont = cont + coluna[cols->indice].peso;
+        cols = cols->next;
+    }
+    return cont;
+}
+
 void insereElem(int c, int l){
     elem *el = malloc(sizeof(elem));
     el->indice = l;
@@ -59,14 +69,16 @@ void importaArq(char nomearq[]){
        printf("\nArquivo não encontrado! :(");
     }else{
         c = getc(fd);
-        char str[100];
+        char str[500];
         str[0] = '\0';
+        int i = 0;
         while(c != EOF){
             if(c != '\n')
-                sprintf(str,"%s%c",str,c);
+                str[i++] = c;
             else{
+                str[i] = '\0';
                 splitLinha(str);
-                str[0] = '\0';
+                i = 0;
             }
             c = getc(fd);
         }
@@ -95,7 +107,7 @@ void printElems(){
 }
 
 void insereColnoCrom(cromossomo *crom, int ncol){
-    crom->peso = coluna[ncol].peso + crom->peso;
+    crom->peso = (coluna[ncol].peso + crom->peso);
     elem *col = malloc(sizeof(elem));
     col->indice = ncol;
     col->next = NULL;
@@ -169,24 +181,33 @@ void geraPopInicial(){
 
 void optimizeCrom(cromossomo *crom){
     elem *cols = crom->cols;
+    elem *ant = crom->cols;
     while(cols){
         elem *lins = coluna[cols->indice].next;
         while(lins){
-            if(crom->lins[lins->indice] > 1)
+            if(crom->lins[lins->indice] > 1){
                 lins = lins->next;
+            }
             else
                 break;
         }
         if(!lins){
             elem *lins = coluna[cols->indice].next;
             while(lins){
-                crom->lins[lins->indice]--;
+                crom->lins[lins->indice] = crom->lins[lins->indice]-1;
                 lins = lins->next;
             }
-            crom->peso = crom->peso - coluna[cols->indice].peso;
-            *cols = *cols->next;
-        } else
+            crom->peso = (crom->peso - coluna[cols->indice].peso);
+            if(cols->next)
+                    *cols = *cols->next;
+            else{
+                 ant->next = NULL;
+                 cols = NULL;
+            }
+        } else {
+            ant = cols;
             cols = cols->next;
+        }
     }
 }
 
@@ -214,7 +235,7 @@ void cruzaCromossomos(){
         }
     }
     int i;
-    for(i = 1; i < nlins+1; i++)
+    for(i = 0; i < nlins+1; i++)
         novo->lins[i] = pai1->lins[i] + pai2->lins[i];
     optimizeCrom(novo);
     insereNapop(novo);
@@ -222,7 +243,7 @@ void cruzaCromossomos(){
 
 cromossomo* newCrom(cromossomo *base){
     cromossomo *aux = malloc(sizeof(cromossomo));
-    aux->peso = 0;
+    aux->cols = NULL;
     aux->lins = calloc(nlins+1,sizeof(int));
     elem *elm = base->cols;
     while(elm){
@@ -232,14 +253,15 @@ cromossomo* newCrom(cromossomo *base){
     return aux;
 }
 
-cromossomo* melhorVizinho(cromossomo *slin, int k){
+cromossomo* melhorVizinho(cromossomo *slin){
     cromossomo *best = slin;
     int j;
     for(j=1;j<5;j++){
-        int i;
         cromossomo *ncrom = newCrom(slin);
-        for(i=1;i<k+1; i++){
-            insereColnoCrom(ncrom,rand() % ncol + 1);
+        int i;
+        for(i=1;i<NEIGHBORHOOD_COUNT; i++){
+            int rcol = rand() % ncol + 1;
+            insereColnoCrom(ncrom, rcol);
         }
         optimizeCrom(ncrom);
         if(ncrom->peso < best->peso)
@@ -251,8 +273,8 @@ cromossomo* melhorVizinho(cromossomo *slin, int k){
 void VND(cromossomo *crom){
     cromossomo *slin = crom;
     int k = 1;
-    while(k <= NEIGHBORHOOD_TYPES){
-        cromossomo *s2lin = melhorVizinho(slin, k);
+    while(k <= NEIGHBORHOOD_COUNT){
+        cromossomo *s2lin = melhorVizinho(slin);
         if(s2lin->peso < slin->peso){
             k = 1;
             slin = s2lin;
@@ -310,23 +332,26 @@ void printCromossomo(cromossomo *crom){
     int i;
     for(i=1;i<nlins+1;i++)
         printf("%d ",crom->lins[i]);
+    printf(" cols->");
+    elem *prox_col = crom->cols;
+        while(prox_col){
+            printf(" %d,",prox_col->indice);
+            prox_col = prox_col->next;
+       }
+
 }
 
 void printPop(){
     int i;
     for(i=0;i<POP_SIZE;i++){
-        printf("\ncromossomo %d, peso %f cols ->",i,populacao[i].peso);
-        elem *prox_col = populacao[i].cols;
-        while(prox_col){
-            printf(" %d,",prox_col->indice);
-            prox_col = prox_col->next;
-       }
+        printCromossomo(&populacao[i]);
     }
 }
 
 int main( int argc, char *argv[] ){
-   importaArq("../tests/Teste_01.txt");
+    importaArq("../tests/Teste_01.txt");
     geneticOptimizer();
+    printPop();
     printCromossomo(populacao);
   return 0;
 }
