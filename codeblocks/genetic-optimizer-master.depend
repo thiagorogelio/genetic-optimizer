@@ -17,3 +17,12 @@
 
 1384170694 /tmp/guest-7mssbd/Área de Trabalho/genetic-optimizer/src/include/structs.h
 
+1384853076 source:/home/maxx/genetic-optimizer/src/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	"include/structs.h"
+
+1384851066 /home/maxx/genetic-optimizer/src/include/structs.h
+

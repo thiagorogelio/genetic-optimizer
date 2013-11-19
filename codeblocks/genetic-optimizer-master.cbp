@@ -26,6 +26,16 @@
 		<Unit filename="../src/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../tests/Teste_00.dat.txt" />
+		<Unit filename="../tests/Teste_01.txt" />
+		<Unit filename="../tests/Teste_02.dat.txt" />
+		<Unit filename="../tests/Teste_03.dat.txt" />
+		<Unit filename="../tests/Teste_04.dat.txt" />
+		<Unit filename="../tests/Teste_05.dat.txt" />
+		<Unit filename="../tests/Wren_01.dat.txt" />
+		<Unit filename="../tests/Wren_02.dat.txt" />
+		<Unit filename="../tests/Wren_03.dat.txt" />
+		<Unit filename="../tests/Wren_04.dat.txt" />
 		<Extensions>
 			<code_completion />
 			<debugger />
